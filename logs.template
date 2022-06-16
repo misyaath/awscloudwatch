@@ -42,7 +42,6 @@
         "Description": "Instance Profile for cloudwatch agent agent",
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
         ],
         "Policies": [
           {
