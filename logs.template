@@ -2,71 +2,85 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "",
   "Resources": {
-    "wpMePHPErrorLog": {
+    "awsCloudwatchPHPErrorLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "wpMePHPErrorLog",
+        "LogGroupName": "awsCloudwatchPHPErrorLog",
         "RetentionInDays": 30
       }
     },
-    "wpMeApacheErrorLog": {
+    "awsCloudwatchApacheErrorLog": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "wpMeApacheErrorLog",
+        "LogGroupName": "awsCloudwatchApacheErrorLog",
         "RetentionInDays": 30
       }
     },
-    "wpMeApacheAccessLog": {
+    "awsCloudwatchApacheAccessLog": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "wpMeApacheAccessLog",
+        "LogGroupName": "awsCloudwatchApacheAccessLog",
         "RetentionInDays": 30
       }
     },
-    "wpMeGroupLogPolicy": {
-      "Type": "AWS::IAM::Policy",
+    "awsCloudwatchInstanceRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
-        "PolicyDocument": {
+        "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
             {
-              "Sid": "wpMeGroupLogPolicy",
+              "Sid": "",
               "Effect": "Allow",
-              "Action": "logs:PutRetentionPolicy",
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["wpMePHPErrorLog", "Arn"]
-                },
-                {
-                  "Fn::GetAtt": ["wpMeApacheErrorLog", "Arn"]
-                },
-                {
-                  "Fn::GetAtt": ["wpMeApacheAccessLog", "Arn"]
-                }
-              ]
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
             }
           ]
         },
-        "PolicyName": "wpMeGroupLogPolicy",
-        "Roles": [
+        "Description": "Instance Profile for cloudwatch agent agent",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        ],
+        "Policies": [
           {
-            "Fn::ImportValue": "wpMeAppInstanceRole"
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "awsCloudwatchGroupLogPolicy",
+                  "Effect": "Allow",
+                  "Action": "logs:PutRetentionPolicy",
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "awsCloudwatchPHPErrorLogGroup",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "awsCloudwatchApacheErrorLog",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "awsCloudwatchApacheErrorLog",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "PolicyName": "awsCloudwatchGroupLogPolicy"
           }
-        ]
-      }
-    },
-    "wpMeManagedPolicy": {
-      "Type" : "AWS::IAM::ManagedPolicy",
-      "Properties" : {
-        "Description" : String,
-        "Groups" : [ String, ... ],
-        "ManagedPolicyName" : String,
-        "Path" : String,
-        "PolicyDocument" : Json,
-        "Roles" : [ String, ... ],
-        "Users" : [ String, ... ]
+        ],
+        "RoleName": "awsCloudwatchInstanceRole"
       }
     }
-
   }
 }
