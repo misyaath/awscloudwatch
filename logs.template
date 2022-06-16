@@ -1,0 +1,72 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Resources": {
+    "wpMePHPErrorLog": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "wpMePHPErrorLog",
+        "RetentionInDays": 30
+      }
+    },
+    "wpMeApacheErrorLog": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "wpMeApacheErrorLog",
+        "RetentionInDays": 30
+      }
+    },
+    "wpMeApacheAccessLog": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "wpMeApacheAccessLog",
+        "RetentionInDays": 30
+      }
+    },
+    "wpMeGroupLogPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "wpMeGroupLogPolicy",
+              "Effect": "Allow",
+              "Action": "logs:PutRetentionPolicy",
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["wpMePHPErrorLog", "Arn"]
+                },
+                {
+                  "Fn::GetAtt": ["wpMeApacheErrorLog", "Arn"]
+                },
+                {
+                  "Fn::GetAtt": ["wpMeApacheAccessLog", "Arn"]
+                }
+              ]
+            }
+          ]
+        },
+        "PolicyName": "wpMeGroupLogPolicy",
+        "Roles": [
+          {
+            "Fn::ImportValue": "wpMeAppInstanceRole"
+          }
+        ]
+      }
+    },
+    "wpMeManagedPolicy": {
+      "Type" : "AWS::IAM::ManagedPolicy",
+      "Properties" : {
+        "Description" : String,
+        "Groups" : [ String, ... ],
+        "ManagedPolicyName" : String,
+        "Path" : String,
+        "PolicyDocument" : Json,
+        "Roles" : [ String, ... ],
+        "Users" : [ String, ... ]
+      }
+    }
+
+  }
+}
